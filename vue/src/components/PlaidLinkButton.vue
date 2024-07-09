@@ -4,6 +4,7 @@
 
 <script>
 import { PlaidLink } from 'vue-plaid-link';
+import directus from '@/services/directus';
 
 export default {
   components: { PlaidLink },
@@ -29,11 +30,15 @@ export default {
     },
     async handleOnSuccess(public_token, metadata) {
       try {
-        const response = await this.$axios.post('/api/plaid/exchange-token', {
-          public_token,
-          metadata,
+        const response = await fetch('/api/plaid/exchange-token', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ public_token, metadata }),
         });
-        await this.storePlaidData(response.data);
+        const data = await response.json();
+        await this.storePlaidData(data);
       } catch (error) {
         console.error('Error exchanging token:', error);
       }
@@ -46,10 +51,10 @@ export default {
     },
     async storePlaidData(data) {
       try {
-        await this.$axios.post('/api/directus/items/plaid_accounts', {
+        await directus.items('plaid_accounts').createOne({
           access_token: data.access_token,
           item_id: data.item_id,
-          user_id: this.$store.state.user.id,
+          user_id: this.$root.$data.userId, // Assuming you store user ID in root instance
         });
       } catch (error) {
         console.error('Error storing Plaid data:', error);
