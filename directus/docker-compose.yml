@@ -1,0 +1,16 @@
+services:
+  directus:
+    image: directus/directus:10.13.0
+    ports:
+      - 8055:8055
+    volumes:
+      - ~/Projects/budgetApp/storage/database:/directus/database
+      - ~/Projects/budgetApp/storage/uploads:/directus/uploads
+      - ~/Projects/budgetApp/storage/extensions:/directus/extensions
+    environment:
+      SECRET: $DIRECTUS_SECRET
+      ADMIN_EMAIL: $ADMIN_EMAIL
+      ADMIN_PASSWORD: $ADMIN_PASSWORD
+      DB_CLIENT: $DB_CLIENT
+      DB_FILENAME: $DB_FILENAME
+      WEBSOCKETS_ENABLED: "true"
